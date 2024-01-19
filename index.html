@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Snail Slots</title>
+
+    <!-- Include external JavaScript file -->
+    <script src="SuperSnailSlots/your_script.js"></script>
+
+    <!-- Include external CSS file -->
+    <link rel="stylesheet" type="text/css" href="SuperSnailSlots/styles.css">
+
+    <style>
+        /* Additional inline styles, if needed */
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+  	  }
+
+
+        #slotMachine img {
+            max-width: 7%;
+            max-height: 7%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Super Snail Slots</h1>
+
+    <div id="slotMachine">
+        <div id="slot1"><img id="imgSlot1" src="" alt="Slot 1"></div>
+        <div id="slot2"><img id="imgSlot2" src="" alt="Slot 2"></div>
+    </div>
+
+    <p>Points: <span id="points">1000</span></p>
+    <button onclick="spin()">Spin</button>
+    <button onclick="playMultipleTimes(100)">Play 100 Times</button>
+    <button onclick="reset()">Reset</button>
+
+    <h2>Results</h2>
+    <ul id="resultsList"></ul>
+
+    <script>
+        // Define your options for the slot machine
+        var options = ['Cobweb', 'Cockroach', 'Fly', 'Spider', 'Snail'];
+
+        // Define points and cost per spin
+        var points = 1000;
+        var spinCost = 10;
+
+        // Results array to keep track of outcomes
+        var results = [];
+
+        // Function to generate a random option
+        function getRandomOption() {
+            var randomIndex = Math.floor(Math.random() * options.length);
+            return options[randomIndex];
+        }
+
+        // Function to calculate points based on the result
+        function calculatePoints(result1, result2) {
+            var pointsWon = 0;
+
+            if (result1 === 'Snail' && result2 === 'Snail') {
+                pointsWon = 100;
+            } else if (result1 === 'Cobweb' && result2 === 'Fly') {
+		pointsWon = 10;
+            } else if (result1 === 'Fly' && result2 === 'Cobweb') {
+		pointsWon = 10;
+            } else if (result1 === 'Cockroach' && result2 === 'Cobweb') {
+		pointsWon = 30;
+            } else if (result1 === 'Cobweb' && result2 === 'Cockroach') {
+		pointsWon = 30;
+            } else if (result1 === 'Spider' && result2 === 'Cobweb') {
+                pointsWon = 10;
+            } else if (result1 === 'Cobweb' && result2 === 'Spider') {
+                pointsWon = 10;
+            } else if (result1 === 'Spider' && result2 === 'Fly') {
+                pointsWon = 25;
+            } else if (result1 === 'Fly' && result2 === 'Spider') {
+                pointsWon = 25;
+            } else if (result1 === 'Cockroach' && result2 === 'Spider') {
+                pointsWon = 40;
+            } else if (result1 === 'Spider' && result2 === 'Cockroach') {
+                pointsWon = 40;
+            }
+
+            return pointsWon;
+        }
+
+        // Function to update the results list
+        function updateResultsList(result, pointsWon) {
+            var resultsList = document.getElementById('resultsList');
+            var listItem = document.createElement('li');
+            listItem.textContent = `Result: ${result.join(', ')} | Points Won: ${pointsWon}`;
+            resultsList.appendChild(listItem);
+        }
+
+        // Function to get the image path based on the result
+        function getImagePath(result) {
+            // Map options to image filenames
+            var imageMap = {
+                'Cobweb': 'cobweb.png',
+                'Cockroach': 'cockroach.png',
+                'Fly': 'fly.png',
+                'Spider': 'spider.png',
+                'Snail': 'snail.png'
+            };
+
+            // Check if the result is a valid option
+            if (imageMap.hasOwnProperty(result)) {
+                // Return the image path
+                return 'images/' + imageMap[result];
+            } else {
+                // Log an error if the result is not recognized
+                console.error('Error: Image path not found for result:', result);
+                // Default to a placeholder image if the result is not recognized
+                return 'images/placeholder.png';
+            }
+        }
+
+        // Function to spin the slot machine
+        function spin() {
+            if (points >= spinCost) {
+                // Deduct the spin cost
+                points -= spinCost;
+
+                var result1 = getRandomOption();
+                var result2 = getRandomOption();
+
+                // Ensure there will never be 2 snails at the same time
+                while (result1 === 'Snail' && result2 === 'Snail') {
+                    result2 = getRandomOption();
+                }
+
+                // Calculate points based on the result
+                var pointsWon = calculatePoints(result1, result2);
+
+                // Update points display
+                document.getElementById('points').textContent = points;
+
+                // Display the results with images
+                document.getElementById('imgSlot1').src = getImagePath(result1);
+                document.getElementById('imgSlot2').src = getImagePath(result2);
+
+                // Add points won to total points
+                points += pointsWon;
+
+                // Update points display
+                document.getElementById('points').textContent = points;
+
+                // Update and display results list
+                updateResultsList([result1, result2], pointsWon);
+            } else {
+                alert("Not enough points to spin. You need at least 10 points.");
+            }
+        }
+
+        // Function to play the slot machine multiple times
+        function playMultipleTimes(times) {
+            for (var i = 0; i < times; i++) {
+                spin();
+            }
+        }
+
+        // Function to reset the simulator
+        function reset() {
+            // Reset points
+            points = 1000;
+            document.getElementById('points').textContent = points;
+
+            // Clear results list
+            var resultsList = document.getElementById('resultsList');
+            resultsList.innerHTML = '';
+        }
+    </script>
+</body>
+</html>
+
